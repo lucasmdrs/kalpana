@@ -13,6 +13,7 @@ A Practice Web App project for the meetup group.
 
 
 # Getting Started
-Install Go
-make build
-make serve
+
+1. Install Go
+2. make build
+3. make serve
