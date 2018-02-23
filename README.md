@@ -1,7 +1,7 @@
 
 # Kalpana
 
-A Practice Web App project for the meetup group. 
+A Practice Web App project for the GO meetup group. 
 
 #  Work List 
 1. Build a Restful api
