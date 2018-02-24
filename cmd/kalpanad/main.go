@@ -114,6 +114,7 @@ func main() {
 	http.ListenAndServe(":3333", r)
 }
 
+// ListArticles lists articles
 func ListArticles(w http.ResponseWriter, r *http.Request) {
 	if err := render.RenderList(w, r, NewArticleListResponse(articles)); err != nil {
 		render.Render(w, r, ErrRender(err))
@@ -290,11 +291,13 @@ func init() {
 // in another file, or another sub-package.
 //--
 
+// UserPayload holds user data
 type UserPayload struct {
 	*User
 	Role string `json:"role"`
 }
 
+// NewUserPayloadResponse allocates a new UserPayload
 func NewUserPayloadResponse(user *User) *UserPayload {
 	return &UserPayload{User: user}
 }
@@ -305,6 +308,7 @@ func (u *UserPayload) Bind(r *http.Request) error {
 	return nil
 }
 
+// Render processes the request
 func (u *UserPayload) Render(w http.ResponseWriter, r *http.Request) error {
 	u.Role = "collaborator"
 	return nil
@@ -327,6 +331,7 @@ type ArticleRequest struct {
 	ProtectedID string `json:"id"` // override 'id' json to have more control
 }
 
+// Bind post-processes a request
 func (a *ArticleRequest) Bind(r *http.Request) error {
 	// just a post-process after a decode..
 	a.ProtectedID = ""                                 // unset the protected ID
@@ -350,6 +355,7 @@ type ArticleResponse struct {
 	Elapsed int64 `json:"elapsed"`
 }
 
+// NewArticleResponse returns a new ArticleResponse
 func NewArticleResponse(article *Article) *ArticleResponse {
 	resp := &ArticleResponse{Article: article}
 
@@ -362,14 +368,17 @@ func NewArticleResponse(article *Article) *ArticleResponse {
 	return resp
 }
 
+// Render processes the request
 func (rd *ArticleResponse) Render(w http.ResponseWriter, r *http.Request) error {
 	// Pre-processing before a response is marshalled and sent across the wire
 	rd.Elapsed = 10
 	return nil
 }
 
+// ArticleListResponse holds a list of ArticleResponse
 type ArticleListResponse []*ArticleResponse
 
+// NewArticleListResponse returns a new list of ArticleResponse
 func NewArticleListResponse(articles []*Article) []render.Renderer {
 	list := []render.Renderer{}
 	for _, article := range articles {
@@ -402,11 +411,13 @@ type ErrResponse struct {
 	ErrorText  string `json:"error,omitempty"` // application-level error message, for debugging
 }
 
+// Render processes the request
 func (e *ErrResponse) Render(w http.ResponseWriter, r *http.Request) error {
 	render.Status(r, e.HTTPStatusCode)
 	return nil
 }
 
+// ErrInvalidRequest returns an invalid request
 func ErrInvalidRequest(err error) render.Renderer {
 	return &ErrResponse{
 		Err:            err,
@@ -416,6 +427,7 @@ func ErrInvalidRequest(err error) render.Renderer {
 	}
 }
 
+// ErrRender renders an error
 func ErrRender(err error) render.Renderer {
 	return &ErrResponse{
 		Err:            err,
@@ -425,6 +437,7 @@ func ErrRender(err error) render.Renderer {
 	}
 }
 
+// ErrNotFound defines a reponse for not found resource
 var ErrNotFound = &ErrResponse{HTTPStatusCode: 404, StatusText: "Resource not found."}
 
 //--
@@ -473,7 +486,7 @@ func dbGetArticle(id string) (*Article, error) {
 			return a, nil
 		}
 	}
-	return nil, errors.New("article not found.")
+	return nil, errors.New("article not found")
 }
 
 func dbGetArticleBySlug(slug string) (*Article, error) {
@@ -482,7 +495,7 @@ func dbGetArticleBySlug(slug string) (*Article, error) {
 			return a, nil
 		}
 	}
-	return nil, errors.New("article not found.")
+	return nil, errors.New("article not found")
 }
 
 func dbUpdateArticle(id string, article *Article) (*Article, error) {
@@ -492,7 +505,7 @@ func dbUpdateArticle(id string, article *Article) (*Article, error) {
 			return article, nil
 		}
 	}
-	return nil, errors.New("article not found.")
+	return nil, errors.New("article not found")
 }
 
 func dbRemoveArticle(id string) (*Article, error) {
@@ -502,7 +515,7 @@ func dbRemoveArticle(id string) (*Article, error) {
 			return a, nil
 		}
 	}
-	return nil, errors.New("article not found.")
+	return nil, errors.New("article not found")
 }
 
 func dbGetUser(id int64) (*User, error) {
@@ -511,5 +524,5 @@ func dbGetUser(id int64) (*User, error) {
 			return u, nil
 		}
 	}
-	return nil, errors.New("user not found.")
+	return nil, errors.New("user not found")
 }
